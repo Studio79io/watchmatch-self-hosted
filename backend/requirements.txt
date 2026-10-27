@@ -1,0 +1,10 @@
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+PyYAML==6.0.2
+PlexAPI==4.17.0
+pydantic==2.11.7
+SQLAlchemy==2.0.51
+psycopg[binary]==3.2.10
+alembic==1.16.5
+pytest==8.4.2
+httpx==0.28.1

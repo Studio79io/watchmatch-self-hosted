@@ -1,0 +1,4 @@
+services:
+  watchmatch:
+    environment:
+      AUTH_REQUIRED: "false"

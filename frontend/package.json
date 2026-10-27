@@ -1,0 +1,1 @@
+{"scripts":{"dev":"vite","build":"tsc && vite build","test:e2e":"playwright test"},"dependencies":{"@vitejs/plugin-react":"latest","vite":"latest","typescript":"latest","react":"latest","react-dom":"latest","qrcode.react":"latest"},"devDependencies":{"@types/react":"latest","@types/react-dom":"latest","@playwright/test":"latest"}}

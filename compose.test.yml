@@ -1,0 +1,8 @@
+# Compose v2 override used only by the disposable browser test project.
+services:
+  postgres:
+    volumes: !reset []
+    tmpfs:
+      - /var/lib/postgresql
+  watchmatch:
+    ports: !reset []

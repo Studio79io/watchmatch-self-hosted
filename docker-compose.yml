@@ -1,0 +1,100 @@
+name: watchmatch
+
+services:
+  postgres:
+    image: postgres:18-trixie
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-watchmatch}
+      POSTGRES_USER: ${POSTGRES_USER:-watchmatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    volumes:
+      - ${POSTGRES_DATA_PATH:-./postgres-data}:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-watchmatch} -d ${POSTGRES_DB:-watchmatch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - database
+    restart: unless-stopped
+
+  watchmatch:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${WATCHMATCH_PORT:-8080}:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      PLEX_URL: ${PLEX_URL:-http://host.docker.internal:32400}
+      PLEX_TOKEN: ${PLEX_TOKEN:-}
+      PLEX_MACHINE_IDENTIFIER: ${PLEX_MACHINE_IDENTIFIER:-}
+      PLEX_CLIENT_IDENTIFIER: ${PLEX_CLIENT_IDENTIFIER:-watchmatch-web}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
+      SYSTEM_OWNER_PLEX_ID: ${SYSTEM_OWNER_PLEX_ID:-}
+      SYSTEM_RECOVERY_CODE: ${SYSTEM_RECOVERY_CODE:-}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+      DB_HOST: postgres
+      DB_NAME: ${POSTGRES_DB:-watchmatch}
+      DB_USER: ${POSTGRES_USER:-watchmatch}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-}
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    networks:
+      - app
+      - database
+    restart: unless-stopped
+
+  postgres-test:
+    image: postgres:18-trixie
+    profiles: ["test"]
+    environment:
+      POSTGRES_DB: watchmatch_test
+      POSTGRES_USER: watchmatch_test
+      POSTGRES_PASSWORD: watchmatch_test
+    tmpfs:
+      - /var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watchmatch_test -d watchmatch_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+    networks:
+      - database-test
+
+  test:
+    build: .
+    profiles: ["test"]
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://watchmatch_test:watchmatch_test@postgres-test:5432/watchmatch_test
+      CONFIG_PATH: /app/config.yaml
+      PLEX_TOKEN: ""
+      PYTHONPATH: /app
+    command: ["sh", "-c", "alembic upgrade head && alembic check && pytest -q"]
+    networks:
+      - database-test
+
+  browser-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.e2e
+    profiles: ["browser-test"]
+    depends_on:
+      watchmatch:
+        condition: service_healthy
+    environment:
+      WATCHMATCH_URL: http://watchmatch:8080
+    networks:
+      - app
+
+networks:
+  app:
+  database:
+    internal: true
+  database-test:
+    internal: true

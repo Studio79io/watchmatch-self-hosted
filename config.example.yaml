@@ -1,0 +1,42 @@
+installation:
+  # One WatchMatch Server installation owns one local catalog and one Plex ecosystem.
+  # V2 currently supports Plex only; unsupported values fail at startup.
+  catalog_provider: plex
+
+plex:
+  url: ${PLEX_URL:-http://localhost:32400}
+  token: ${PLEX_TOKEN:-}
+  sync_interval_minutes: 1440
+
+app:
+  public_url: ${PUBLIC_URL:-http://localhost:8080}
+  default_household_slug: ${DEFAULT_HOUSEHOLD_SLUG:-default}
+  room_expiration_minutes: 120
+  stop_on_first_match: true
+  mock_catalog_when_disconnected: true
+
+auth:
+  # Keep false for the local sandbox; production should set AUTH_REQUIRED=true.
+  required: ${AUTH_REQUIRED:-false}
+  session_hours: 24
+  plex_client_identifier: ${PLEX_CLIENT_IDENTIFIER:-watchmatch-web}
+  plex_machine_identifier: ${PLEX_MACHINE_IDENTIFIER:-}
+
+catalog:
+  libraries: []
+  excluded_libraries: []
+  # Room-selectable libraries are managed by the system owner. An empty
+  # persistent allowlist preserves V1's all-synchronized-library behavior.
+  default_libraries:
+    movie: Movies
+    show: TV Shows
+  genre_collections:
+    - Holiday & Seasonal
+  pool_size: 100
+  include_watched: true
+  include_unwatched: true
+  # Empty means all Plex ratings are eligible. Values are exact Plex labels.
+  allowed_content_ratings: []
+
+history:
+  matched_item_cooldown_days: 7

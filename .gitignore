@@ -1,0 +1,52 @@
+# Production configuration and credentials
+.env
+.env.*
+!.env.example
+config.yaml
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.credentials
+credentials.json
+secrets/
+
+# Persistent and generated application data
+postgres-data/
+test-postgres-data/
+postgres-backups/
+backups/
+data/
+outputs/
+work/
+uploads/
+media/
+logs/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node and browser tests
+node_modules/
+frontend/dist/
+playwright-report/
+test-results/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.swp
